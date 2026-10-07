@@ -38,6 +38,59 @@ export const CoreStrengthsBlock: Block = {
   ],
 }
 
+export const ServicesBlock: Block = {
+  slug: 'services',
+  labels: { singular: 'Services & Offerings', plural: 'Services & Offerings' },
+  fields: [
+    { name: 'title', type: 'text', required: true, localized: true },
+    {
+      name: 'panels',
+      type: 'array',
+      minRows: 1,
+      maxRows: 6,
+      fields: [
+        { name: 'heading', type: 'text', required: true, localized: true, admin: { description: 'e.g. For Students' } },
+        { name: 'intro', type: 'textarea', localized: true },
+        { name: 'offeringsLabel', type: 'text', defaultValue: 'Offerings', localized: true },
+        {
+          name: 'offerings',
+          type: 'array',
+          fields: [{ name: 'label', type: 'text', required: true, localized: true }],
+        },
+        { name: 'linkLabel', type: 'text', defaultValue: 'See More', localized: true },
+        { name: 'linkHref', type: 'text', defaultValue: '#' },
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          admin: { description: 'Optional. A built-in placeholder illustration is shown when empty.' },
+        },
+        {
+          name: 'imagePosition',
+          type: 'select',
+          defaultValue: 'right',
+          options: [
+            { label: 'Right', value: 'right' },
+            { label: 'Left', value: 'left' },
+          ],
+        },
+        {
+          name: 'tone',
+          type: 'select',
+          defaultValue: 'brand',
+          admin: { description: 'Background colour of the band. Colours are defined in globals.css.' },
+          options: [
+            { label: 'Brand tint', value: 'brand' },
+            { label: 'Warm', value: 'warm' },
+            { label: 'Sky', value: 'sky' },
+            { label: 'Lavender', value: 'lavender' },
+          ],
+        },
+      ],
+    },
+  ],
+}
+
 export const NewsletterBlock: Block = {
   slug: 'newsletter',
   labels: { singular: 'Newsletter Signup', plural: 'Newsletter Signups' },
@@ -66,4 +119,10 @@ export const RichTextBlock: Block = {
   ],
 }
 
-export const pageBlocks: Block[] = [HeroBlock, CoreStrengthsBlock, NewsletterBlock, RichTextBlock]
+export const pageBlocks: Block[] = [
+  HeroBlock,
+  CoreStrengthsBlock,
+  ServicesBlock,
+  NewsletterBlock,
+  RichTextBlock,
+]

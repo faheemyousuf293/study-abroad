@@ -168,6 +168,27 @@ async function seed() {
         ],
       },
       {
+        blockType: 'services' as const,
+        title: 'Our Services and Offerings',
+        panels: [
+          {
+            heading: 'For Students',
+            intro:
+              'With a keen eye for your choices and preferences, our counselling experience is so seamless that you will land in your dream university!',
+            offeringsLabel: 'Offerings',
+            offerings: [
+              { label: 'Virtual Coaching and Counselling' },
+              { label: 'Applications, Admissions & Visas' },
+              { label: 'High Value Scholarships and Study Loans' },
+            ],
+            linkLabel: 'See More',
+            linkHref: '#',
+            imagePosition: 'right' as const,
+            tone: 'brand' as const,
+          },
+        ],
+      },
+      {
         blockType: 'newsletter' as const,
         title: 'Stay updated with YourBrand',
         interestLabel: "I'm Interested in",

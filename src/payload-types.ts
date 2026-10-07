@@ -245,6 +245,40 @@ export interface Page {
       }
     | {
         title: string;
+        panels?:
+          | {
+              /**
+               * e.g. For Students
+               */
+              heading: string;
+              intro?: string | null;
+              offeringsLabel?: string | null;
+              offerings?:
+                | {
+                    label: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              linkLabel?: string | null;
+              linkHref?: string | null;
+              /**
+               * Optional. A built-in placeholder illustration is shown when empty.
+               */
+              image?: (number | null) | Media;
+              imagePosition?: ('right' | 'left') | null;
+              /**
+               * Background colour of the band. Colours are defined in globals.css.
+               */
+              tone?: ('brand' | 'warm' | 'sky' | 'lavender') | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'services';
+      }
+    | {
+        title: string;
         interestLabel?: string | null;
         interests?:
           | {
@@ -473,6 +507,32 @@ export interface PagesSelect<T extends boolean = true> {
                     label?: T;
                     description?: T;
                     href?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        services?:
+          | T
+          | {
+              title?: T;
+              panels?:
+                | T
+                | {
+                    heading?: T;
+                    intro?: T;
+                    offeringsLabel?: T;
+                    offerings?:
+                      | T
+                      | {
+                          label?: T;
+                          id?: T;
+                        };
+                    linkLabel?: T;
+                    linkHref?: T;
+                    image?: T;
+                    imagePosition?: T;
+                    tone?: T;
                     id?: T;
                   };
               id?: T;

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360" width="360" height="360" role="img" aria-label="Student placeholder illustration">
+  <rect width="360" height="360" fill="#f4f5ff"/>
+  <circle cx="290" cy="80" r="46" fill="#e4e1ff"/>
+  <circle cx="60" cy="290" r="34" fill="#ffe9c7"/>
+  <!-- body -->
+  <path d="M90 360c0-70 40-118 90-118s90 48 90 118z" fill="#5b4bff"/>
+  <path d="M155 246l25 34 25-34" fill="#ffffff"/>
+  <!-- neck -->
+  <rect x="166" y="210" width="28" height="36" rx="10" fill="#f2c4a2"/>
+  <!-- head -->
+  <circle cx="180" cy="168" r="52" fill="#f6cfb1"/>
+  <!-- hair -->
+  <path d="M128 162c0-36 24-60 54-60s52 22 52 56c-14-14-40-22-70-18-14 2-26 10-36 22z" fill="#2b2140"/>
+  <!-- face -->
+  <circle cx="162" cy="172" r="4.5" fill="#2b2140"/>
+  <circle cx="198" cy="172" r="4.5" fill="#2b2140"/>
+  <path d="M166 194c8 7 20 7 28 0" stroke="#2b2140" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <!-- graduation cap -->
+  <path d="M110 112l70-30 70 30-70 30z" fill="#141a33"/>
+  <path d="M146 126v22c20 10 48 10 68 0v-22l-34 16z" fill="#141a33"/>
+  <path d="M244 116v40" stroke="#f5b942" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="244" cy="160" r="6" fill="#f5b942"/>
+  <!-- book -->
+  <rect x="140" y="292" width="80" height="54" rx="6" fill="#f5b942"/>
+  <rect x="148" y="300" width="64" height="38" rx="4" fill="#fff6e0"/>
+  <path d="M180 300v38" stroke="#f5b942" stroke-width="3"/>
+</svg>
