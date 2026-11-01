@@ -4,10 +4,13 @@ import sharp from 'sharp'
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { Students } from './collections/Students'
+import { LoginCodes } from './collections/LoginCodes'
 import { SiteSettings } from './globals/SiteSettings'
 import { Header } from './globals/Header'
 import { Footer } from './globals/Footer'
@@ -20,7 +23,7 @@ export default buildConfig({
     user: Users.slug,
     meta: { titleSuffix: ' – CMS' },
   },
-  collections: [Users, Media, Pages],
+  collections: [Users, Media, Pages, Students, LoginCodes],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -41,5 +44,19 @@ export default buildConfig({
     defaultLocale: 'en',
     fallback: true,
   },
+  // Sends real email when SMTP settings are in .env (e.g. a Gmail account with an app password).
+  // Without them, Payload prints emails to the terminal and sign-in codes are logged there for testing.
+  email: process.env.SMTP_HOST
+    ? nodemailerAdapter({
+        defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || process.env.SMTP_USER || '',
+        defaultFromName: process.env.EMAIL_FROM_NAME || 'ScholarshipHive Edutancy',
+        transportOptions: {
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT) || 465,
+          secure: (Number(process.env.SMTP_PORT) || 465) === 465,
+          auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+        },
+      })
+    : undefined,
   sharp,
 })

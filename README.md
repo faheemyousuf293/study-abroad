@@ -1,7 +1,7 @@
 # Study Portal – iteration 1: public CMS homepage
 
 Next.js 16 + Payload CMS 3 + PostgreSQL, one codebase. This iteration delivers the homepage, built from
-editable blocks, with placeholder brand (**YourBrand**), text and images. Links are placeholders (`#`).
+editable blocks, with the **ScholarshipHive Edutancy** brand and placeholder text and images. Links are placeholders (`#`).
 
 ## Run locally
 

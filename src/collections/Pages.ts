@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { pageBlocks } from '../blocks'
+import { adminOnly, isAdmin } from '../access'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -12,11 +13,11 @@ export const Pages: CollectionConfig = {
     maxPerDoc: 25,
   },
   access: {
-    // Public visitors only ever see published pages; logged-in admins also see drafts.
-    read: ({ req: { user } }) => (user ? true : { _status: { equals: 'published' } }),
-    create: ({ req: { user } }) => Boolean(user?.roles?.includes('admin')),
-    update: ({ req: { user } }) => Boolean(user?.roles?.includes('admin')),
-    delete: ({ req: { user } }) => Boolean(user?.roles?.includes('admin')),
+    // Public visitors only ever see published pages; admins also see drafts.
+    read: ({ req: { user } }) => (isAdmin(user) ? true : { _status: { equals: 'published' } }),
+    create: adminOnly,
+    update: adminOnly,
+    delete: adminOnly,
   },
   fields: [
     { name: 'title', type: 'text', required: true, localized: true },

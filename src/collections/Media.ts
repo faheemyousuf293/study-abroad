@@ -1,6 +1,7 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
 import type { CollectionConfig } from 'payload'
+import { adminOnly } from '../access'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -8,6 +9,9 @@ export const Media: CollectionConfig = {
   slug: 'media',
   access: {
     read: () => true,
+    create: adminOnly,
+    update: adminOnly,
+    delete: adminOnly,
   },
   admin: {
     useAsTitle: 'alt',

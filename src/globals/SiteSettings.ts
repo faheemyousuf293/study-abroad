@@ -1,11 +1,12 @@
 import type { GlobalConfig } from 'payload'
+import { adminOnly } from '../access'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   label: 'Site Settings',
-  access: { read: () => true, update: ({ req: { user } }) => Boolean(user?.roles?.includes('admin')) },
+  access: { read: () => true, update: adminOnly },
   fields: [
-    { name: 'siteName', type: 'text', required: true, defaultValue: 'YourBrand' },
+    { name: 'siteName', type: 'text', required: true, defaultValue: 'ScholarshipHive Edutancy' },
     { name: 'tagline', type: 'text', localized: true },
     { name: 'logo', type: 'upload', relationTo: 'media', admin: { description: 'Optional. Text logo is shown when empty.' } },
     {
@@ -16,11 +17,11 @@ export const SiteSettings: GlobalConfig = {
           name: 'platform',
           type: 'select',
           required: true,
-          options: ['facebook', 'instagram', 'linkedin', 'x', 'youtube'],
+          options: ['facebook', 'instagram', 'whatsapp', 'linkedin', 'x', 'youtube'],
         },
         { name: 'url', type: 'text', required: true, defaultValue: '#' },
       ],
     },
-    { name: 'copyright', type: 'text', localized: true, defaultValue: 'YourBrand 2026' },
+    { name: 'copyright', type: 'text', localized: true, defaultValue: 'ScholarshipHive Edutancy 2026' },
   ],
 }

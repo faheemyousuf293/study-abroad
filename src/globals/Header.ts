@@ -1,8 +1,16 @@
-import type { GlobalConfig } from 'payload'
+import type { Field, GlobalConfig } from 'payload'
+import { adminOnly } from '../access'
+
+const hidden: Field = {
+  name: 'hidden',
+  type: 'checkbox',
+  defaultValue: false,
+  admin: { description: 'Hide from the site without deleting it.' },
+}
 
 export const Header: GlobalConfig = {
   slug: 'header',
-  access: { read: () => true, update: ({ req: { user } }) => Boolean(user?.roles?.includes('admin')) },
+  access: { read: () => true, update: adminOnly },
   fields: [
     {
       name: 'navItems',
@@ -11,12 +19,14 @@ export const Header: GlobalConfig = {
       fields: [
         { name: 'label', type: 'text', required: true, localized: true },
         { name: 'href', type: 'text', defaultValue: '#' },
+        hidden,
         {
           name: 'children',
           type: 'array',
           fields: [
             { name: 'label', type: 'text', required: true, localized: true },
             { name: 'href', type: 'text', defaultValue: '#' },
+            hidden,
           ],
         },
       ],
@@ -29,6 +39,7 @@ export const Header: GlobalConfig = {
         { name: 'label', type: 'text', required: true, localized: true },
         { name: 'href', type: 'text', defaultValue: '#' },
         { name: 'style', type: 'select', defaultValue: 'link', options: ['link', 'button'] },
+        hidden,
       ],
     },
   ],

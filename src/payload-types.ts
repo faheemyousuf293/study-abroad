@@ -64,12 +64,15 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    students: StudentAuthOperations;
   };
   blocks: {};
   collections: {
     users: User;
     media: Media;
     pages: Page;
+    students: Student;
+    'login-codes': LoginCode;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +83,8 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    students: StudentsSelect<false> | StudentsSelect<true>;
+    'login-codes': LoginCodesSelect<false> | LoginCodesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -103,13 +108,31 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | Student;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface StudentAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -134,7 +157,10 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name?: string | null;
-  roles: 'admin'[];
+  /**
+   * Admins manage the whole site here. Staff sign in at /staff to work with student applications only.
+   */
+  roles: ('admin' | 'staff')[];
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -213,7 +239,16 @@ export interface Page {
   slug: string;
   layout: (
     | {
+        hidden?: boolean | null;
         heading: string;
+        /**
+         * Optional. Words from the heading to show in the accent colour, e.g. "Study Abroad".
+         */
+        headingHighlight?: string | null;
+        /**
+         * Optional. Bold opening of the paragraph, shown right before the subheading.
+         */
+        subheadingLead?: string | null;
         subheading?: string | null;
         ctaLabel?: string | null;
         ctaHref?: string | null;
@@ -226,6 +261,63 @@ export interface Page {
         blockType: 'hero';
       }
     | {
+        hidden?: boolean | null;
+        eyebrow?: string | null;
+        name: string;
+        /**
+         * e.g. Founder & Study Abroad Consultant
+         */
+        role?: string | null;
+        bio?: string | null;
+        /**
+         * Portrait photo (about 4:5). A placeholder is shown when empty.
+         */
+        image?: (number | null) | Media;
+        socials?:
+          | {
+              platform: 'instagram' | 'whatsapp' | 'facebook' | 'linkedin' | 'x' | 'youtube';
+              url: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'founder';
+      }
+    | {
+        hidden?: boolean | null;
+        /**
+         * Optional heading above the logos.
+         */
+        title?: string | null;
+        /**
+         * Optional line under the heading.
+         */
+        subtitle?: string | null;
+        logos?:
+          | {
+              image: number | Media;
+              /**
+               * e.g. Harvard University (used as alt text)
+               */
+              name: string;
+              /**
+               * Optional link.
+               */
+              href?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Seconds for one full loop. Lower is faster.
+         */
+        duration?: number | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'logoCarousel';
+      }
+    | {
+        hidden?: boolean | null;
         title: string;
         items?:
           | {
@@ -244,6 +336,7 @@ export interface Page {
         blockType: 'coreStrengths';
       }
     | {
+        hidden?: boolean | null;
         title: string;
         panels?:
           | {
@@ -265,11 +358,36 @@ export interface Page {
                * Optional. A built-in placeholder illustration is shown when empty.
                */
               image?: (number | null) | Media;
+              /**
+               * Show the round image next to the text.
+               */
+              showImage?: boolean | null;
               imagePosition?: ('right' | 'left') | null;
               /**
                * Background colour of the band. Colours are defined in globals.css.
                */
               tone?: ('brand' | 'warm' | 'sky' | 'lavender') | null;
+              /**
+               * Service cards shown in a row below this panel.
+               */
+              cards?:
+                | {
+                    icon?: ('plane' | 'target' | 'grade' | 'cap' | 'globe' | 'document') | null;
+                    /**
+                     * Colour of the line along the top of the card.
+                     */
+                    accent?: ('blue' | 'red' | 'navy' | 'gold') | null;
+                    /**
+                     * Small label, e.g. Study Visa
+                     */
+                    eyebrow?: string | null;
+                    title: string;
+                    description?: string | null;
+                    linkLabel?: string | null;
+                    linkHref?: string | null;
+                    id?: string | null;
+                  }[]
+                | null;
               id?: string | null;
             }[]
           | null;
@@ -278,6 +396,52 @@ export interface Page {
         blockType: 'services';
       }
     | {
+        hidden?: boolean | null;
+        title: string;
+        /**
+         * Optional text under the heading.
+         */
+        subtitle?: string | null;
+        items?:
+          | {
+              flag?:
+                | (
+                    | 'it'
+                    | 'gb'
+                    | 'fr'
+                    | 'de'
+                    | 'ie'
+                    | 'es'
+                    | 'nl'
+                    | 'be'
+                    | 'at'
+                    | 'hu'
+                    | 'pl'
+                    | 'us'
+                    | 'ca'
+                    | 'au'
+                    | 'cn'
+                    | 'tr'
+                  )
+                | null;
+              /**
+               * e.g. Study in Italy
+               */
+              title: string;
+              /**
+               * Portrait photo (about 3:4) of a landmark.
+               */
+              image?: (number | null) | Media;
+              href?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'destinations';
+      }
+    | {
+        hidden?: boolean | null;
         title: string;
         interestLabel?: string | null;
         interests?:
@@ -292,6 +456,7 @@ export interface Page {
         blockType: 'newsletter';
       }
     | {
+        hidden?: boolean | null;
         content?: {
           root: {
             type: string;
@@ -319,6 +484,138 @@ export interface Page {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * Student sign-ups. Staff follow them up at /staff.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "students".
+ */
+export interface Student {
+  id: number;
+  name?: string | null;
+  phone?: string | null;
+  destination?:
+    | (
+        | 'gb'
+        | 'us'
+        | 'au'
+        | 'de'
+        | 'ca'
+        | 'ie'
+        | 'nz'
+        | 'sg'
+        | 'ae'
+        | 'nl'
+        | 'fr'
+        | 'se'
+        | 'at'
+        | 'dk'
+        | 'fi'
+        | 'it'
+        | 'hu'
+        | 'ch'
+        | 'es'
+        | 'lt'
+        | 'lv'
+        | 'cy'
+        | 'pl'
+        | 'my'
+        | 'mu'
+        | 'hk'
+        | 'cn'
+        | 'vn'
+        | 'mt'
+        | 'jp'
+        | 'be'
+        | 'ru'
+        | 'kr'
+        | 'ge'
+        | 'id'
+        | 'ph'
+        | 'cz'
+        | 'pk'
+      )
+    | null;
+  studyLevel?:
+    | (
+        | 'bachelors'
+        | 'masters'
+        | 'ug_diploma'
+        | 'pg_diploma'
+        | 'phd'
+        | 'diploma_certificate'
+        | 'foundation_pathway'
+        | 'others'
+      )
+    | null;
+  studyArea?:
+    | (
+        | 'agriculture'
+        | 'architecture'
+        | 'arts'
+        | 'business'
+        | 'computer_science'
+        | 'education'
+        | 'engineering'
+        | 'environmental'
+        | 'health'
+        | 'humanities'
+        | 'law'
+        | 'life_sciences'
+        | 'manufacturing'
+        | 'physical_sciences'
+        | 'security_services'
+        | 'social_behavioural'
+        | 'social_services'
+        | 'transport_services'
+        | 'veterinary'
+      )
+    | null;
+  city?: string | null;
+  office?: string | null;
+  /**
+   * When the student finished all onboarding steps.
+   */
+  onboardingCompletedAt?: string | null;
+  status?: ('new' | 'contacted' | 'in-progress' | 'applied' | 'enrolled' | 'closed') | null;
+  assignedTo?: (number | null) | User;
+  /**
+   * Internal only — students never see this.
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'students';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "login-codes".
+ */
+export interface LoginCode {
+  id: number;
+  email: string;
+  codeHash: string;
+  expiresAt: string;
+  attempts?: number | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -355,12 +652,25 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'students';
+        value: number | Student;
+      } | null)
+    | ({
+        relationTo: 'login-codes';
+        value: number | LoginCode;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'students';
+        value: number | Student;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -370,10 +680,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'students';
+        value: number | Student;
+      };
   key?: string | null;
   value?:
     | {
@@ -488,7 +803,10 @@ export interface PagesSelect<T extends boolean = true> {
         hero?:
           | T
           | {
+              hidden?: T;
               heading?: T;
+              headingHighlight?: T;
+              subheadingLead?: T;
               subheading?: T;
               ctaLabel?: T;
               ctaHref?: T;
@@ -496,9 +814,47 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        founder?:
+          | T
+          | {
+              hidden?: T;
+              eyebrow?: T;
+              name?: T;
+              role?: T;
+              bio?: T;
+              image?: T;
+              socials?:
+                | T
+                | {
+                    platform?: T;
+                    url?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        logoCarousel?:
+          | T
+          | {
+              hidden?: T;
+              title?: T;
+              subtitle?: T;
+              logos?:
+                | T
+                | {
+                    image?: T;
+                    name?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              duration?: T;
+              id?: T;
+              blockName?: T;
+            };
         coreStrengths?:
           | T
           | {
+              hidden?: T;
               title?: T;
               items?:
                 | T
@@ -515,6 +871,7 @@ export interface PagesSelect<T extends boolean = true> {
         services?:
           | T
           | {
+              hidden?: T;
               title?: T;
               panels?:
                 | T
@@ -531,8 +888,39 @@ export interface PagesSelect<T extends boolean = true> {
                     linkLabel?: T;
                     linkHref?: T;
                     image?: T;
+                    showImage?: T;
                     imagePosition?: T;
                     tone?: T;
+                    cards?:
+                      | T
+                      | {
+                          icon?: T;
+                          accent?: T;
+                          eyebrow?: T;
+                          title?: T;
+                          description?: T;
+                          linkLabel?: T;
+                          linkHref?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        destinations?:
+          | T
+          | {
+              hidden?: T;
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    flag?: T;
+                    title?: T;
+                    image?: T;
+                    href?: T;
                     id?: T;
                   };
               id?: T;
@@ -541,6 +929,7 @@ export interface PagesSelect<T extends boolean = true> {
         newsletter?:
           | T
           | {
+              hidden?: T;
               title?: T;
               interestLabel?: T;
               interests?:
@@ -556,6 +945,7 @@ export interface PagesSelect<T extends boolean = true> {
         richText?:
           | T
           | {
+              hidden?: T;
               content?: T;
               id?: T;
               blockName?: T;
@@ -570,6 +960,52 @@ export interface PagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "students_select".
+ */
+export interface StudentsSelect<T extends boolean = true> {
+  name?: T;
+  phone?: T;
+  destination?: T;
+  studyLevel?: T;
+  studyArea?: T;
+  city?: T;
+  office?: T;
+  onboardingCompletedAt?: T;
+  status?: T;
+  assignedTo?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "login-codes_select".
+ */
+export interface LoginCodesSelect<T extends boolean = true> {
+  email?: T;
+  codeHash?: T;
+  expiresAt?: T;
+  attempts?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -625,7 +1061,7 @@ export interface SiteSetting {
   logo?: (number | null) | Media;
   socials?:
     | {
-        platform: 'facebook' | 'instagram' | 'linkedin' | 'x' | 'youtube';
+        platform: 'facebook' | 'instagram' | 'whatsapp' | 'linkedin' | 'x' | 'youtube';
         url: string;
         id?: string | null;
       }[]
@@ -647,10 +1083,18 @@ export interface Header {
     | {
         label: string;
         href?: string | null;
+        /**
+         * Hide from the site without deleting it.
+         */
+        hidden?: boolean | null;
         children?:
           | {
               label: string;
               href?: string | null;
+              /**
+               * Hide from the site without deleting it.
+               */
+              hidden?: boolean | null;
               id?: string | null;
             }[]
           | null;
@@ -665,6 +1109,10 @@ export interface Header {
         label: string;
         href?: string | null;
         style?: ('link' | 'button') | null;
+        /**
+         * Hide from the site without deleting it.
+         */
+        hidden?: boolean | null;
         id?: string | null;
       }[]
     | null;
@@ -678,6 +1126,9 @@ export interface Header {
 export interface Footer {
   id: number;
   aboutTitle?: string | null;
+  /**
+   * Wrap words in **double asterisks** to make them bold.
+   */
   aboutText?: string | null;
   columns?:
     | {
@@ -693,6 +1144,24 @@ export interface Footer {
               id?: string | null;
             }[]
           | null;
+        id?: string | null;
+      }[]
+    | null;
+  officesTitle?: string | null;
+  /**
+   * Office cards with an embedded Google map, shown above the bottom bar.
+   */
+  offices?:
+    | {
+        /**
+         * e.g. Lahore
+         */
+        title: string;
+        address: string;
+        /**
+         * Optional. What to search on Google Maps for the pin (a place name, plus code or "lat,lng"). Uses the address when empty.
+         */
+        mapQuery?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -736,11 +1205,13 @@ export interface HeaderSelect<T extends boolean = true> {
     | {
         label?: T;
         href?: T;
+        hidden?: T;
         children?:
           | T
           | {
               label?: T;
               href?: T;
+              hidden?: T;
               id?: T;
             };
         id?: T;
@@ -751,6 +1222,7 @@ export interface HeaderSelect<T extends boolean = true> {
         label?: T;
         href?: T;
         style?: T;
+        hidden?: T;
         id?: T;
       };
   updatedAt?: T;
@@ -776,6 +1248,15 @@ export interface FooterSelect<T extends boolean = true> {
               badge?: T;
               id?: T;
             };
+        id?: T;
+      };
+  officesTitle?: T;
+  offices?:
+    | T
+    | {
+        title?: T;
+        address?: T;
+        mapQuery?: T;
         id?: T;
       };
   legalLinks?:
